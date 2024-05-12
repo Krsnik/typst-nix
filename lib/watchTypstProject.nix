@@ -15,7 +15,7 @@ in
     ppi ? 144,
     packages ? [],
     open ? false,
-    editor ? "${pkgs.zathura}/bin/zathura",
+    viewer ? "${pkgs.zathura}/bin/zathura",
     out ? "./.preview",
   }: let
     allowedFormats = ["pdf" "png" "svg"];
@@ -40,7 +40,7 @@ in
       --ppi ${builtins.toString ppi} \
       ${
         if open
-        then "--open ${editor}"
+        then "--open ${viewer}"
         else ""
       } \
         ${out}/${name}${

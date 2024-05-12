@@ -54,14 +54,12 @@
 
           packages = [packageSet.${system}];
           enablePreviewPackages = true;
-          previewPackagesRepository = "${
-            (pkgs.${system}.fetchFromGitHub {
-              owner = "typst";
-              repo = "packages";
-              rev = "3fdc5567a7027833212b465af5c19d59325c75ba";
-              sha256 = "B6aH3EQhAukMsuZBvv975KNs7d8pHX2jMc2uppho/1Q=";
-            })
-          }/packages";
+          previewPackagesRepository = "${(pkgs.${system}.fetchFromGitHub {
+            owner = "typst";
+            repo = "packages";
+            rev = "3fdc5567a7027833212b465af5c19d59325c75ba";
+            sha256 = "B6aH3EQhAukMsuZBvv975KNs7d8pHX2jMc2uppho/1Q=";
+          })}/packages";
           fonts = with pkgs.${system}; [roboto];
           inputs = {lang = "de";};
         });
@@ -75,14 +73,12 @@
 
           packages = [
             packageSet.${system}
-            "${
-              (pkgs.${system}.fetchFromGitHub {
-                owner = "typst";
-                repo = "packages";
-                rev = "3fdc5567a7027833212b465af5c19d59325c75ba";
-                sha256 = "B6aH3EQhAukMsuZBvv975KNs7d8pHX2jMc2uppho/1Q=";
-              })
-            }/packages"
+            "${(pkgs.${system}.fetchFromGitHub {
+              owner = "typst";
+              repo = "packages";
+              rev = "3fdc5567a7027833212b465af5c19d59325c75ba";
+              sha256 = "B6aH3EQhAukMsuZBvv975KNs7d8pHX2jMc2uppho/1Q=";
+            })}/packages"
           ];
           enablePreviewPackages = false;
           fonts = with pkgs.${system}; [roboto];
@@ -127,7 +123,11 @@
       example1 = projects.example1.${system}.watch {open = true;};
       example2 = projects.example2.${system}.watch {open = true;};
       example3 = projects.example3.${system}.watch {open = true;};
-      example4 = projects.example4.${system}.watch {open = true;};
+      example4 = projects.example4.${system}.watch {
+        open = true;
+        viewer = "${pkgs.zathura}/bin/zathura";
+        out = "./.preview";
+      };
     });
 
     devShells = forAllSystems (system: {

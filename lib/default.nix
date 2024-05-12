@@ -1,4 +1,7 @@
-{pkgs}: let
+{
+  pkgs,
+  previewPackagesRepository,
+} @ args: let
   typstPackages = pkgs.callPackage ./typstPackage.nix {};
   mkTypstProject = pkgs.callPackage ./mkTypstProject.nix {};
   watchTypstProject = pkgs.callPackage ./watchTypstProject.nix {};
@@ -21,28 +24,20 @@ in {
     ppi ? 144,
     packages ? [],
     enablePreviewPackages ? false,
-    previewPackagesRepository ? "${
-      (pkgs.fetchFromGitHub {
-        owner = "typst";
-        repo = "packages";
-        rev = "3fdc5567a7027833212b465af5c19d59325c75ba";
-        sha256 = "B6aH3EQhAukMsuZBvv975KNs7d8pHX2jMc2uppho/1Q=";
-      })
-    }/packages",
+    previewPackagesRepository ? args.previewPackagesRepository,
   }: let
-    packageList = typstPackages.toPackageList (
+    packageList =
       if enablePreviewPackages
       then packages ++ [previewPackagesRepository]
-      else packages
-    );
+      else packages ++ [];
   in {
     watch = {
       open ? false,
-      editor ? "${pkgs.zathura}/bin/zathura",
+      viewer ? "${pkgs.zathura}/bin/zathura",
       out ? "./.preview",
     }: {
       program = "${watchTypstProject {
-        inherit name entrypoint fonts inputs format ppi open editor out;
+        inherit name entrypoint fonts inputs format ppi open viewer out;
         packages = packageList;
         src = watchPath;
       }}/bin/watch";
