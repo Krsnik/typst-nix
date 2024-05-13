@@ -11,6 +11,7 @@ in {
 
   mkTypstPackage = typstPackages.mkPackage;
   mkTypstPackageSet = typstPackages.mkPackageSet;
+  mergePackageSets = typstPackages.mergePackageSets;
   toPackageList = typstPackages.toPackageList;
 
   mkProject = {

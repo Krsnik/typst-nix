@@ -125,7 +125,7 @@
       example3 = projects.example3.${system}.watch {open = true;};
       example4 = projects.example4.${system}.watch {
         open = true;
-        viewer = "${pkgs.zathura}/bin/zathura";
+        viewer = "${pkgs.${system}.zathura}/bin/zathura";
         out = "./.preview";
       };
     });
