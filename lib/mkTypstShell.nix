@@ -1,23 +1,24 @@
-{
-  pkgs,
-  typst ? pkgs.typst,
-}: let
+{pkgs}: let
   strings = pkgs.lib.strings;
   typstPackages = pkgs.callPackage ./typstPackage.nix {};
 in
   {
-    fonts ? null,
+    typst ? pkgs.typst,
+    fonts ? [],
     packages ? [],
+    creationTimestamp ? 0, # The document's creation date formatted as a UNIX timestamp.
   }:
     pkgs.mkShellNoCC {
+      SOURCE_DATE_EPOCH = builtins.toString creationTimestamp;
+
       TYPST_FONT_PATHS =
-        if fonts != null
+        if fonts != []
         then strings.concatStringsSep ":" fonts
         else null;
 
-      XDG_DATA_HOME =
+      TYPST_PACKAGE_PATH =
         if packages != []
-        then typstPackages.mkPackageCache packages
+        then typstPackages.mergeTypstPackageSets packages
         else null;
 
       packages = [

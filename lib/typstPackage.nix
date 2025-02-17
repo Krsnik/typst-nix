@@ -2,7 +2,7 @@
   lists = pkgs.lib.lists;
   attrsets = pkgs.lib.attrsets;
 in rec {
-  toPackageList = packages: lists.flatten (builtins.map getTypstPackagePaths packages);
+  toTypstPackageList = packages: lists.flatten (builtins.map getTypstPackagePaths packages);
 
   getTypstPackagePaths = dir: let
     contents = builtins.readDir dir;
@@ -16,7 +16,7 @@ in rec {
     then lists.flatten (builtins.map (subdir: getTypstPackagePaths "${dir}/${subdir}") subdirs)
     else [dir];
 
-  mkPackageSet = srcs:
+  mkTypstPackageSet = srcs:
     pkgs.stdenvNoCC.mkDerivation {
       name = "";
 
@@ -34,34 +34,24 @@ in rec {
                   mkdir -p $out/${namespace}/${name}
                   cp -r ${src} $out/${namespace}/${name}/${version}
                 '')
-                (toPackageList srcs.${namespace})
+                (toTypstPackageList srcs.${namespace})
             )
             (builtins.attrNames srcs))
         }
       '';
     };
 
-  mkPackage = {
+  mkTypstPackage = {
     src,
-    namespace,
+    namespace ? "preview",
+    # packages ? [], # TODO: dependencies
+    # fonts ? [],
   }:
-    mkPackageSet {${namespace} = [src];};
+    mkTypstPackageSet {${namespace} = [src];};
 
-  mergePackageSets = packageSets:
+  mergeTypstPackageSets = packageSets:
     pkgs.symlinkJoin {
       name = "";
       paths = packageSets;
-    };
-
-  mkPackageCache = packages:
-    pkgs.stdenvNoCC.mkDerivation {
-      name = "";
-
-      dontUnpack = true;
-
-      installPhase = ''
-        mkdir -p $out/typst/
-        ln -s ${mergePackageSets packages} $out/typst/packages
-      '';
     };
 }
