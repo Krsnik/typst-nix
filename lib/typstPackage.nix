@@ -43,8 +43,17 @@ in rec {
     builtins.mapAttrs (namespace: packageSrcs:
       builtins.foldl' (acc: src: let
         package = mkTypstPackage {inherit src namespace;};
+        versionList = builtins.match "([0-9]).([0-9]).([0-9])" package.version;
+        major = builtins.elemAt versionList 0;
+        minor = builtins.elemAt versionList 1;
+        patch = builtins.elemAt versionList 2;
       in
-        attrsets.recursiveUpdate acc {${package.name}.${package.version} = package;})
+        attrsets.recursiveUpdate acc {
+          ${package.name} = {
+            ${package.version} = package;
+            ${major}.${minor}.${patch} = package;
+          };
+        })
       {} (getTypstPackagePathsFromList packageSrcs))
     srcs;
 }
