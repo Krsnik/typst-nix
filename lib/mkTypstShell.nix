@@ -18,7 +18,7 @@ in
 
       TYPST_PACKAGE_PATH =
         if packages != []
-        then typstPackages.mergeTypstPackageSets packages
+        then typstPackages.mergeTypstPackages packages
         else null;
 
       packages = [

@@ -33,12 +33,14 @@ in
       buildPhase = ''
         mkdir $out
 
+        # TODO: timings $out/dev/timings.json
+
         typst compile "${entrypoint}" \
         --jobs "${builtins.toString jobs}" \
         --creation-timestamp "${builtins.toString creationTimestamp}" \
         ${
           if packages != []
-          then ''--package-path "${typstPackage.mergeTypstPackageSets packages}"''
+          then ''--package-path "${typstPackage.mergeTypstPackages packages}"''
           else ""
         } \
         --ignore-system-fonts \

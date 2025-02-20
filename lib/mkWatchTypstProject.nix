@@ -44,12 +44,14 @@ in
           else ""
         }
 
+        # TODO: timings $out/$${timings_name_timings}.json
+
         typst watch "${entrypoint}" \
         --jobs "${builtins.toString jobs}" \
         --creation-timestamp "${builtins.toString creationTimestamp}" \
         ${
           if packages != []
-          then ''--package-path "${typstPackage.mergeTypstPackageSets packages}"''
+          then ''--package-path "${typstPackage.mergeTypstPackages packages}"''
           else ""
         } \
         --ignore-system-fonts \

@@ -2,7 +2,7 @@
   lists = pkgs.lib.lists;
   attrsets = pkgs.lib.attrsets;
 in rec {
-  toTypstPackageList = packages: lists.flatten (builtins.map getTypstPackagePaths packages);
+  getTypstPackagePathsFromList = packages: lists.unique (lists.flatten (builtins.map getTypstPackagePaths packages));
 
   getTypstPackagePaths = dir: let
     contents = builtins.readDir dir;
@@ -12,34 +12,9 @@ in rec {
       else null)
     contents);
   in
-    if (builtins.filter (x: x == "typst.toml") (builtins.attrNames contents)) == []
-    then lists.flatten (builtins.map (subdir: getTypstPackagePaths "${dir}/${subdir}") subdirs)
-    else [dir];
-
-  mkTypstPackageSet = srcs:
-    pkgs.stdenvNoCC.mkDerivation {
-      name = "";
-
-      dontUnpack = true;
-
-      installPhase = ''
-        mkdir $out
-
-        ${
-          builtins.toString (builtins.map (
-              namespace:
-                builtins.map (src: let
-                  inherit ((builtins.fromTOML (builtins.readFile "${src}/typst.toml")).package) name version;
-                in ''
-                  mkdir -p $out/${namespace}/${name}
-                  cp -r ${src} $out/${namespace}/${name}/${version}
-                '')
-                (toTypstPackageList srcs.${namespace})
-            )
-            (builtins.attrNames srcs))
-        }
-      '';
-    };
+    if builtins.elem "typst.toml" (builtins.attrNames contents)
+    then [dir]
+    else lists.unique (lists.flatten (builtins.map (subdir: getTypstPackagePaths "${dir}/${subdir}") subdirs));
 
   mkTypstPackage = {
     src,
@@ -47,11 +22,29 @@ in rec {
     # packages ? [], # TODO: dependencies
     # fonts ? [],
   }:
-    mkTypstPackageSet {${namespace} = [src];};
+    pkgs.stdenvNoCC.mkDerivation rec {
+      inherit ((builtins.fromTOML (builtins.readFile "${src}/typst.toml")).package) name version;
 
-  mergeTypstPackageSets = packageSets:
+      dontUnpack = true;
+
+      installPhase = ''
+        mkdir --parents "$out/${namespace}/${name}"
+        ln --symbolic "${src}" "$out/${namespace}/${name}/${version}"
+      '';
+    };
+
+  mergeTypstPackages = packageSets:
     pkgs.symlinkJoin {
       name = "";
       paths = packageSets;
     };
+
+  mkTypstPackageSet = srcs:
+    builtins.mapAttrs (namespace: packageSrcs:
+      builtins.foldl' (acc: src: let
+        package = mkTypstPackage {inherit src namespace;};
+      in
+        attrsets.recursiveUpdate acc {${package.name}.${package.version} = package;})
+      {} (getTypstPackagePathsFromList packageSrcs))
+    srcs;
 }
