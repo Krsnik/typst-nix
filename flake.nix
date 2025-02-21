@@ -20,43 +20,36 @@
     forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
     pkgs = forAllSystems (system: nixpkgs.legacyPackages.${system});
   in rec {
-    previewPackagesRepository = "${inputs.previewPackagesRepository}/packages/preview";
-
-    #         builtins.mapAttrs (namespace: packages:
-    #   builtins.mapAttrs (
-    #     packages: package: let
-    #       # Since mapAttrs returns the values in alphabetically sorted order,
-    #       # the last element is going to be the highest version.
-    #       versions = builtins.attrValues package;
-    #       index = (builtins.length versions) - 1;
-    #       latestVersion = builtins.elemAt versions index;
-    #     in
-    #       latestVersion
-    #   )
-    #   packages)
-    # pset
+    previewPackages = forAllSystems (system:
+      self.lib.${system}.typstPackages.mkTypstPackageSet {
+        "preview" = ["${inputs.previewPackagesRepository}/packages/preview"];
+      });
 
     packages = forAllSystems (
       system:
-        self.lib.${system}.typstPackages.mkTypstPackageSet {
-          "preview" = [
-            "${self.previewPackagesRepository}/zero"
-            "${self.previewPackagesRepository}/vartable"
-          ];
-          "two" = ["${self.previewPackagesRepository}/zero"];
-        }
+        builtins.mapAttrs (
+          packageName: package: let
+            # Since mapAttrs returns the values in alphabetically sorted order,
+            # the last element is going to be the highest version.
+            versions = builtins.filter (x: builtins.match "([0-9])\.([0-9])\.([0-9])" != null) (builtins.attrNames package);
+            index = (builtins.length versions) - 1;
+            latestVersion = builtins.elemAt versions index;
+          in
+            package.${latestVersion}
+        )
+        self.previewPackages.${system}.preview
     );
 
     mkLib = args @ {
       pkgs,
-      previewPackagesRepository ? self.previewPackagesRepository,
+      previewPackages ? self.previewPackages,
     }:
       import ./lib args;
 
     lib = forAllSystems (system:
       mkLib {
         pkgs = pkgs.${system};
-        previewPackagesRepository = self.previewPackagesRepository;
+        previewPackages = self.previewPackages;
       });
 
     checks = forAllSystems (system:

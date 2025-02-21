@@ -1,6 +1,6 @@
 args @ {
   pkgs,
-  previewPackagesRepository ? null,
+  previewPackages ? {},
 }: rec {
   # Expose library functions #
   mkTypstDerevation = pkgs.callPackage ./mkTypstDerevation.nix {};
@@ -9,7 +9,7 @@ args @ {
 
   # Functions pertaining to packages
   typstPackages = pkgs.callPackage ./typstPackage.nix {};
-  # inherit (typstPackages) mkTypstPackage getTypstPackagePaths mkTypstPackageSet;
+  inherit (typstPackages) mkTypstPackage;
   # mkTypstPackageSet = typstPackages.mkPackageSet;
   # mergeTypstPackageSets = typstPackages.mergePackageSets;
   # toTypstPackageList = typstPackages.toPackageList;
@@ -18,7 +18,7 @@ args @ {
   shell = mkTypstShell {};
 
   # Expose preview bound previewPackagesRepository
-  inherit previewPackagesRepository;
+  # inherit previewPackagesRepository;
 
   # Create a project with build and run options
   mkTypstProject = let
