@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  ...
 }: let
   package = lib.mkTypstPackage {
     src = ./src;

@@ -9,8 +9,7 @@ args @ {
 
   # Functions pertaining to packages
   typstPackages = pkgs.callPackage ./typstPackage.nix {};
-  inherit (typstPackages) mkTypstPackage;
-  # mkTypstPackageSet = typstPackages.mkPackageSet;
+  inherit (typstPackages) mkTypstPackage mkTypstPackageSet;
   # mergeTypstPackageSets = typstPackages.mergePackageSets;
   # toTypstPackageList = typstPackages.toPackageList;
 

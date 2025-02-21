@@ -22,22 +22,15 @@
   in rec {
     previewPackages = forAllSystems (system:
       self.lib.${system}.typstPackages.mkTypstPackageSet {
-        "preview" = ["${inputs.previewPackagesRepository}/packages/preview"];
+        "preview" = ["${inputs.previewPackagesRepository}/packages/preview/"];
       });
 
     packages = forAllSystems (
-      system:
-        builtins.mapAttrs (
-          packageName: package: let
-            # Since mapAttrs returns the values in alphabetically sorted order,
-            # the last element is going to be the highest version.
-            versions = builtins.filter (x: builtins.match "([0-9])\.([0-9])\.([0-9])" != null) (builtins.attrNames package);
-            index = (builtins.length versions) - 1;
-            latestVersion = builtins.elemAt versions index;
-          in
-            package.${latestVersion}
-        )
-        self.previewPackages.${system}.preview
+      system: let
+        attrsets = pkgs.${system}.lib.attrsets;
+        packages = attrsets.collect (x: x ? "type" && x.type == "derivation") self.previewPackages.${system}.preview;
+      in
+        builtins.foldl' (acc: package: acc // {"preview/${package.name}:${package.version}" = package;}) {} packages
     );
 
     mkLib = args @ {
@@ -54,6 +47,7 @@
 
     checks = forAllSystems (system:
       import ./checks {
+        inherit self system;
         pkgs = pkgs.${system};
         lib = self.lib.${system};
       });

@@ -1,7 +1,4 @@
-{
-  pkgs,
-  lib,
-}:
+{lib, ...}:
 lib.mkTypstPackage {
-  src = lib.previewPackagesRepository;
+  src = ./src;
 }
