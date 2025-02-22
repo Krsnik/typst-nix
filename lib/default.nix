@@ -25,7 +25,7 @@ args @ {
       fonts ? [],
       packages ?
         if enablePreviewPackages
-        then [previewPackagesRepository]
+        then mergeTypstPackages previewPackages
         else [],
       inputs ? {},
       format ? "pdf", # The format of the output file.
@@ -36,10 +36,10 @@ args @ {
       pages ? "1-", # Which pages to export. When unspecified, all document pages are exported.
       jobs ? 0, # Number of parallel jobs spawned during compilation, defaults to number of CPUs.
       enablePreviewPackages ? false,
-      previewPackagesRepository ?
-        if enablePreviewPackages && args.previewPackagesRepository != null
-        then args.previewPackagesRepository
-        else throw "enablePreviewPackages = true but previewPackagesRepository is not defined.",
+      previewPackages ?
+        if enablePreviewPackages && args.previewPackages != {}
+        then args.previewPackages
+        else throw "enablePreviewPackages == true but previewPackages is not defined.",
     }: rec {
       build = mkTypstDerevation {
         inherit src name entrypoint fonts packages inputs format ppi typst numberFormat creationTimestamp pages jobs;

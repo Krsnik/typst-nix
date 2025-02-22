@@ -20,7 +20,7 @@
     pkgs = forAllSystems (system: nixpkgs.legacyPackages.${system});
   in rec {
     previewPackages = forAllSystems (system:
-      self.lib.${system}.typstPackages.mkTypstPackageSet {
+      self.lib.${system}.mkTypstPackageSet {
         "preview" = ["${inputs.previewPackagesRepository}/packages/preview/"];
       });
 
