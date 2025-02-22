@@ -27,7 +27,8 @@
     packages = forAllSystems (
       system: let
         attrsets = pkgs.${system}.lib.attrsets;
-        packages = attrsets.collect (x: x ? "type" && x.type == "derivation") self.previewPackages.${system}.preview;
+        isDerivation = x: x ? "type" && x.type == "derivation";
+        packages = attrsets.collect isDerivation self.previewPackages.${system}.preview;
       in
         builtins.foldl' (acc: package: acc // {"preview/${package.name}:${package.version}" = package;}) {} packages
     );
