@@ -28,9 +28,8 @@
       system: let
         attrsets = pkgs.${system}.lib.attrsets;
         isDerivation = x: x ? "type" && x.type == "derivation";
-        packages = attrsets.collect isDerivation self.previewPackages.${system}.preview;
       in
-        builtins.foldl' (acc: package: acc // {"preview/${package.name}:${package.version}" = package;}) {} packages
+        attrsets.filterAttrs (name: value: isDerivation value) self.previewPackages.${system}
     );
 
     mkLib = args @ {
