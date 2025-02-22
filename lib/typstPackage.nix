@@ -47,8 +47,8 @@ in rec {
       paths = packageSets;
     };
 
-  mkTypstPackageSet = srcs:
-    builtins.mapAttrs (namespace: packageSrcs:
+  mkTypstPackageSet = srcs: let
+    packageSetWithoutAbsolutePaths = builtins.mapAttrs (namespace: packageSrcs:
       builtins.foldl' (acc: src: let
         package = mkTypstPackage {inherit src namespace;};
         versionList = builtins.match "([0-9]+)\.([0-9]+)\.([0-9]+)" package.version;
@@ -64,4 +64,15 @@ in rec {
         })
       {} (getTypstPackagePathsFromList packageSrcs))
     srcs;
+  in
+    packageSetWithoutAbsolutePaths
+    // (
+      builtins.foldl' (acc: packages: acc // packages) {} (builtins.attrValues (builtins.mapAttrs (
+          namespace: packages: let
+            packageDrvs = attrsets.collect (x: x ? "type" && x.type == "derivation") packages;
+          in
+            builtins.foldl' (acc: package: acc // {"${namespace}/${package.name}:${package.version}" = package;}) {} packageDrvs
+        )
+        packageSetWithoutAbsolutePaths))
+    );
 }

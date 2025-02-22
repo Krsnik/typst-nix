@@ -18,8 +18,10 @@
 in
   assert packages
   == {
+    "preview/example:0.1.0" = packagePreview;
     preview.example."0.1.0" = packagePreview;
     preview.example."0"."1"."0" = packagePreview;
+    "otherNamespace/example:0.1.0" = packageOtherNamespace;
     otherNamespace.example."0.1.0" = packageOtherNamespace;
     otherNamespace.example."0"."1"."0" = packageOtherNamespace;
   };
