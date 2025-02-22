@@ -14,9 +14,6 @@ args @ {
   # Empty shell with just typst
   shell = mkTypstShell {};
 
-  # Expose preview bound previewPackagesRepository
-  # inherit previewPackagesRepository;
-
   # Create a project with build and run options
   mkTypstProject = let
     strings = pkgs.lib.strings;
