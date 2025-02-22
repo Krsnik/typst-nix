@@ -4,4 +4,5 @@ args: {
   mkTypstPackage = import ./mkTypstPackage args;
   mkTypstPackageSet = import ./mkTypstPackageSet args;
   nestedPackage = import ./nestedPackage args;
+  overlays = import ./overlays args;
 }

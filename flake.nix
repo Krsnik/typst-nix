@@ -52,6 +52,12 @@
         lib = self.lib.${system};
       });
 
+    overlays = import ./overlays {
+      inherit self;
+    };
+
+    overlay = overlays.default;
+
     templates = import ./templates {};
   };
 }
