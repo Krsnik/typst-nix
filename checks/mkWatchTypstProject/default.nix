@@ -16,4 +16,5 @@ lib.mkWatchTypstProject {
   };
   open = true;
   out = "./typst/preview";
+  timings = true;
 }

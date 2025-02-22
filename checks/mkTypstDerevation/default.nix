@@ -15,4 +15,5 @@ lib.mkTypstDerevation {
     lang = "de";
     hello = 12;
   };
+  timings = true;
 }

@@ -19,6 +19,7 @@ in
     viewer ? "${pkgs.zathura}/bin/zathura",
     out ? null, # Which directory to save the temporary output. Default: Create a new temporary directory.
     keepOut ? false,
+    timings ? false, # Produces performance timings of the compilation process (experimental).
   }: let
     allowedFormats = ["pdf" "png" "svg"];
     checkedFormat =
@@ -37,6 +38,12 @@ in
           then out
           else "$(mktemp --directory)"
         }"
+
+        ${
+          if timings
+          then ''mkdir -p "$TYPST_WATCH_DIRECTORY/dev"''
+          else ""
+        }
 
         ${
           if !keepOut
@@ -70,6 +77,11 @@ in
         ${
           if open
           then ''--open "${viewer}"''
+          else ""
+        } \
+        ${
+          if timings
+          then ''--timings "$TYPST_WATCH_DIRECTORY/dev/timings.json"''
           else ""
         } \
         "$TYPST_WATCH_DIRECTORY/${name}${

@@ -16,6 +16,7 @@ in
     creationTimestamp ? 0, # The document's creation date formatted as a UNIX timestamp.
     pages ? "1-", # Which pages to export. When unspecified, all document pages are exported.
     jobs ? 0, # Number of parallel jobs spawned during compilation, defaults to number of CPUs.
+    timings ? false, # Produces performance timings of the compilation process (experimental).
   }: let
     allowedFormats = ["pdf" "png" "svg"];
     checkedFormat =
@@ -31,7 +32,11 @@ in
       ];
 
       buildPhase = ''
-        mkdir $out
+        ${
+          if timings
+          then "mkdir -p $out/dev"
+          else "mkdir $out"
+        }
 
         # TODO: timings $out/dev/timings.json
 
@@ -56,6 +61,11 @@ in
         } \
         --pages "${pages}" \
         --ppi "${builtins.toString ppi}" \
+        ${
+          if timings
+          then "--timings $out/dev/timings.json"
+          else ""
+        } \
         "$out/${name}${
           if builtins.elem checkedFormat ["png" "svg"]
           then numberFormat

@@ -35,6 +35,7 @@ args @ {
       creationTimestamp ? 0, # The document's creation date formatted as a UNIX timestamp.
       pages ? "1-", # Which pages to export. When unspecified, all document pages are exported.
       jobs ? 0, # Number of parallel jobs spawned during compilation, defaults to number of CPUs.
+      timings ? false, # Produces performance timings of the compilation process (experimental).
       enablePreviewPackages ? false,
       previewPackages ?
         if enablePreviewPackages && args.previewPackages != {}
@@ -42,7 +43,7 @@ args @ {
         else throw "enablePreviewPackages == true but previewPackages is not defined.",
     }: rec {
       build = mkTypstDerevation {
-        inherit src name entrypoint fonts packages inputs format ppi typst numberFormat creationTimestamp pages jobs;
+        inherit src name entrypoint fonts packages inputs format ppi typst numberFormat creationTimestamp pages jobs timings;
       };
 
       mkWatch = {
@@ -52,7 +53,7 @@ args @ {
         keepOut ? false,
       }:
         mkWatchTypstProject {
-          inherit name entrypoint fonts packages inputs format ppi typst numberFormat creationTimestamp pages jobs open viewer out keepOut;
+          inherit name entrypoint fonts packages inputs format ppi typst numberFormat creationTimestamp pages jobs timings open viewer out keepOut;
         };
 
       watch = args @ {
