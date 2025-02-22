@@ -1,5 +1,7 @@
-{self, ...}: {
-  default = final: prev: {
+{self, ...}: rec {
+  default = typstPackages;
+
+  typstPackages = final: prev: {
     typst = self.pkgs.${prev.system}.typst;
     typstPackages = self.previewPackages.${prev.system};
   };
