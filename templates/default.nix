@@ -1,4 +1,6 @@
-{}: {
+{}: rec {
+  default = example;
+
   example = {
     path = ./example;
 

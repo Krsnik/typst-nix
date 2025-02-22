@@ -59,5 +59,7 @@
     overlay = overlays.default;
 
     templates = import ./templates {};
+
+    defaultTemplate = templates.default;
   };
 }
