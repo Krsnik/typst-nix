@@ -24,13 +24,12 @@ in
   pkgs.runCommandLocal "mergeTypstPackage" {
     src = mergedPackages;
   } ''
-      ls -la
     packages=(
-    "namespace0/${package1.name}/${package1.version}/"
-    "namespace2/${package1.name}/${package1.version}/"
-    "namespace3/${package1.name}/${package1.version}/"
-    "namespace4/${package1.name}/${package1.version}/"
-    "namespace5/${package1.name}/${package1.version}/"
+      "namespace1/${package1.name}/${package1.version}/"
+      "namespace2/${package1.name}/${package1.version}/"
+      "namespace3/${package1.name}/${package1.version}/"
+      "namespace4/${package1.name}/${package1.version}/"
+      "namespace5/${package1.name}/${package1.version}/"
     )
 
     for package in ''${packages[@]}; do
