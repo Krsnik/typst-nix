@@ -41,10 +41,19 @@ in rec {
       }
     else package;
 
-  mergeTypstPackages = packageSets:
+  mergeTypstPackages = packagesOrPackageSets: let
+    isDerivation = x: x ? "type" && x.type == "derivation";
+  in
     pkgs.symlinkJoin {
       name = "";
-      paths = packageSets;
+      paths = builtins.foldl' (acc: elem:
+        acc
+        ++ (
+          if isDerivation elem
+          then [elem]
+          else attrsets.collect isDerivation elem
+        )) []
+      packagesOrPackageSets;
     };
 
   mkTypstPackageSet = srcs: let

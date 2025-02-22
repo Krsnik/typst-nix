@@ -1,5 +1,5 @@
 {
-  description = "A Typst project";
+  description = "A library to create Typst projects.";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -13,7 +13,6 @@
   outputs = inputs @ {
     self,
     nixpkgs,
-    previewPackagesRepository,
     ...
   }: let
     supportedSystems = ["x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" "i686-linux"];
@@ -56,10 +55,6 @@
       inherit self;
     };
 
-    overlay = overlays.default;
-
     templates = import ./templates {};
-
-    defaultTemplate = templates.default;
   };
 }
