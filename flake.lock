@@ -16,26 +16,26 @@
         "type": "github"
       }
     },
-    "previewPackagesRepository": {
+    "root": {
+      "inputs": {
+        "nixpkgs": "nixpkgs",
+        "typstPackagesRepository": "typstPackagesRepository"
+      }
+    },
+    "typstPackagesRepository": {
       "flake": false,
       "locked": {
-        "lastModified": 1739953413,
-        "narHash": "sha256-wwMCLTFWEJvyQZMZ+N30LrG9w6FfoWfp9tzCt4BXFQc=",
+        "lastModified": 1740145309,
+        "narHash": "sha256-IaOccCfzbYaB2ZaqixMQRn85mApURe3I34BhcceyJ3Y=",
         "owner": "typst",
         "repo": "packages",
-        "rev": "7752964daa3196be81af765fa0dedb7b3661da22",
+        "rev": "b30f6e4346083e5c7dbf420dd88108e389ad94c0",
         "type": "github"
       },
       "original": {
         "owner": "typst",
         "repo": "packages",
         "type": "github"
-      }
-    },
-    "root": {
-      "inputs": {
-        "nixpkgs": "nixpkgs",
-        "previewPackagesRepository": "previewPackagesRepository"
       }
     }
   },

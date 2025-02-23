@@ -2,20 +2,21 @@
 
 A nix library to develop and build [Typst](https://typst.app/) projects.
 
-# Documentation
+## Features
 
-## mkLib
+- Unit Tests
+- Create packages
+- Allow fonts
+- Watch script configured like the build environment.
+- Shell environment configures like the build environment.
+- Support almost all Typst command line options.
 
-Function to create a `lib` set.
+## TODO
 
-### Inputs
-
-`pkgs`
-
-An instance of a [nixpkgs](https://github.com/NixOS/nixpkgs) package set.
-
-`previewPackagesRepository`
-
-Path to a [preview packages](https://github.com/typst/packages).
-
-## lib.$\{system\}
+- Documentation
+- mkTypstPackage
+  - Allow for embedding fonts
+  - Allow for linking embedding arbitrary data
+- mkTypstDerevation
+  - Allow for html support. (With version check).
+  - Make into an abstract method that the consumer can override parts of.

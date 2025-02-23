@@ -1,6 +1,6 @@
 args @ {
   pkgs,
-  previewPackages ? {},
+  typstPackages ? {},
 }: rec {
   # Expose library functions #
   mkTypstDerevation = pkgs.callPackage ./mkTypstDerevation.nix {};
@@ -9,24 +9,22 @@ args @ {
 
   # Functions pertaining to packages
   typstPackages = pkgs.callPackage ./typstPackage.nix {};
-  inherit (typstPackages) mkTypstPackage mkTypstPackageSet mergeTypstPackages;
+  inherit (typstPackages) mkTypstPackage mkTypstPackageSet mergeTypstPackages getPackageImports;
 
-  # Empty shell with just typst
+  # Shell with just Typst
   shell = mkTypstShell {};
 
   # Create a project with build and run options
   mkTypstProject = let
     strings = pkgs.lib.strings;
+    attrsets = pkgs.lib.attrsets;
   in
-    {
+    mkTypstProjectArgs @ {
       src,
       name ? strings.removeSuffix ".typ" (builtins.baseNameOf entrypoint),
       entrypoint ? "main.typ",
       fonts ? [],
-      packages ?
-        if enablePreviewPackages
-        then mergeTypstPackages previewPackages
-        else [],
+      packages ? [],
       inputs ? {},
       format ? "pdf", # The format of the output file.
       ppi ? 144, # The PPI (pixels per inch) to use for PNG export
@@ -36,14 +34,31 @@ args @ {
       pages ? "1-", # Which pages to export. When unspecified, all document pages are exported.
       jobs ? 0, # Number of parallel jobs spawned during compilation, defaults to number of CPUs.
       timings ? false, # Produces performance timings of the compilation process (experimental).
-      enablePreviewPackages ? false,
-      previewPackages ?
-        if enablePreviewPackages && args.previewPackages != {}
-        then args.previewPackages
-        else throw "enablePreviewPackages == true but previewPackages is not defined.",
-    }: rec {
+      # enableTypstPackages ? false, # This will enable ALL typst packages and cause 600+ MiB dependency!
+      autoDiscoverPackages ? true, # This will look through the source code and try to find official typst package import and only include them when building.
+      typstPackages ?
+        if autoDiscoverPackages && args.typstPackages == {}
+        then throw "enableTypstPackages == true but typstPackages is not defined. Define for the library or directly in the function call."
+        else args.typstPackages,
+    }: let
+      mappedPackages =
+        packages
+        ++ (
+          if autoDiscoverPackages
+          then
+            builtins.foldl' (acc: elem:
+              acc
+              ++ (
+                if typstPackages ? "${elem}"
+                then [(attrsets.getAttrFromPath [elem] typstPackages)]
+                else []
+              )) [] (getPackageImports src)
+          else []
+        );
+    in rec {
       build = mkTypstDerevation {
-        inherit src name entrypoint fonts packages inputs format ppi typst numberFormat creationTimestamp pages jobs timings;
+        inherit src name entrypoint fonts inputs format ppi typst numberFormat creationTimestamp pages jobs timings;
+        packages = mappedPackages;
       };
 
       mkWatch = {
@@ -53,7 +68,8 @@ args @ {
         keepOut ? false,
       }:
         mkWatchTypstProject {
-          inherit name entrypoint fonts packages inputs format ppi typst numberFormat creationTimestamp pages jobs timings open viewer out keepOut;
+          inherit name entrypoint fonts inputs format ppi typst numberFormat creationTimestamp pages jobs timings open viewer out keepOut;
+          packages = mappedPackages;
         };
 
       watch = args @ {
@@ -67,7 +83,8 @@ args @ {
       };
 
       shell = mkTypstShell {
-        inherit typst fonts packages creationTimestamp;
+        inherit typst fonts creationTimestamp;
+        packages = mappedPackages;
       };
     };
 }

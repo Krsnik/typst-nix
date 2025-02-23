@@ -29,7 +29,7 @@ in rec {
 
       installPhase = ''
         mkdir --parents "$out/${namespace}/${name}"
-        ln --symbolic "${src}" "$out/${namespace}/${name}/${version}"
+        cp --recursive "${src}" "$out/${namespace}/${name}/${version}"
       '';
     };
   in
@@ -51,7 +51,13 @@ in rec {
         ++ (
           if isDerivation elem
           then [elem]
-          else attrsets.collect isDerivation elem
+          else if builtins.isPath elem && builtins.pathExists elem
+          then [elem]
+          else if builtins.isString elem && builtins.pathExists elem
+          then [elem]
+          else if builtins.isAttrs elem
+          then attrsets.collect isDerivation elem
+          else throw "Unsupported input."
         )) []
       packagesOrPackageSets;
     };
@@ -72,7 +78,11 @@ in rec {
             ${major}.${minor}.${patch} = package;
           };
         })
-      {} (getTypstPackagePathsFromList packageSrcs))
+      {} (getTypstPackagePathsFromList (builtins.map (src:
+        if builtins.isAttrs src
+        then getDerivationPackages src
+        else src)
+      packageSrcs)))
     srcs;
 
     attrsets = pkgs.lib.attrsets;
@@ -84,4 +94,21 @@ in rec {
     packageSetWithoutAbsolutePaths;
   in
     packageSetWithoutAbsolutePaths // absolutePaths;
+
+  getPackageImports = let
+    strings = pkgs.lib.strings;
+    lists = pkgs.lib.lists;
+    attersets = pkgs.lib.attrsets;
+    namespace = ".*";
+    packageName = namespace;
+    version = "[0-9]+\\.[0-9]+\\.[0-9]+";
+    getImportsFromFile = typstFile: builtins.filter (x: !(x == null)) (builtins.map (builtins.match "[[:blank:]]*\"@(${namespace}/${packageName}:${version})\".*") (strings.splitString "import" (builtins.readFile typstFile)));
+  in
+    src:
+      lists.flatten (attersets.collect builtins.isList (builtins.mapAttrs (fileName: fileType:
+        if fileType == "regular" && (builtins.match ".*\.typ" fileName) != null
+        then getImportsFromFile "${src}/${fileName}"
+        else if fileType == "directory"
+        then getPackageImports "${src}/${fileName}"
+        else []) (builtins.readDir src)));
 }

@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    previewPackagesRepository = {
+    typstPackagesRepository = {
       url = "github:typst/packages";
       flake = false;
     };
@@ -19,10 +19,13 @@
     forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
     pkgs = forAllSystems (system: nixpkgs.legacyPackages.${system});
   in rec {
-    typstPackages = forAllSystems (system:
-      self.lib.${system}.mkTypstPackageSet {
-        "preview" = ["${inputs.previewPackagesRepository}/packages/preview/"];
-      });
+    typstPackages = forAllSystems (system: let
+      attrsets = pkgs.${system}.lib.attrsets;
+      packagesDir = "${inputs.typstPackagesRepository}/packages";
+      namespaces = attrsets.filterAttrs (filename: filetype: filetype == "directory") (builtins.readDir packagesDir);
+      namespacesWithSrcs = attrsets.concatMapAttrs (namespace: value: {${namespace} = ["${packagesDir}/${namespace}"];}) namespaces;
+    in
+      self.lib.${system}.mkTypstPackageSet namespacesWithSrcs);
 
     previewPackages =
       forAllSystems (system:
@@ -36,14 +39,14 @@
 
     mkLib = args @ {
       pkgs,
-      previewPackages ? self.previewPackages,
+      typstPackages ? self.typstPackages.${pkgs.system},
     }:
       import ./lib args;
 
     lib = forAllSystems (system:
       mkLib {
         pkgs = pkgs.${system};
-        previewPackages = self.previewPackages;
+        typstPackages = self.typstPackages.${system};
       });
 
     checks = forAllSystems (system:
@@ -56,6 +59,11 @@
     overlays = import ./overlays {
       inherit self;
     };
+
+    devShells = forAllSystems (system:
+      import ./shells {
+        inherit self system;
+      });
 
     templates = import ./templates {};
   };
