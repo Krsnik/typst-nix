@@ -1,2 +1,9 @@
+# Nix #
 /result
 /.direnv
+
+# Typst #
+*.pdf
+*.png
+*.svg
+*.html

@@ -16,15 +16,24 @@ in
     pages ? "1-", # Which pages to export. When unspecified, all document pages are exported.
     jobs ? 0, # Number of parallel jobs spawned during compilation, defaults to number of CPUs.
     open ? false,
-    viewer ? "${pkgs.zathura}/bin/zathura",
+    viewer ?
+      if format == "html"
+      then "${pkgs.xdg-utils}/bin/xdg-open"
+      else "${pkgs.zathura}/bin/zathura",
     out ? null, # Which directory to save the temporary output. Default: Create a new temporary directory.
     keepOut ? false,
     timings ? false, # Produces performance timings of the compilation process (experimental).
+    port ? null, # The port where HTML is served.
+    noServe ? false, # Disables the built-in HTTP server for HTML export.
+    noReload ? false, # Disables the injected live reload script for HTML export.
   }: let
-    allowedFormats = ["pdf" "png" "svg"];
+    allowedFormats = ["pdf" "png" "svg" "html"];
     checkedFormat =
       if builtins.elem format allowedFormats
-      then format
+      then
+        if format == "html" && (builtins.compareVersions typst.version "0.13.0") < 0
+        then throw "HTML export is only supported for Typst versions >= '0.13.0'. Current version: '${typst.version}'."
+        else format
       else throw "'${format}' is not in allowedFormats [${builtins.toString allowedFormats}]";
   in
     pkgs.writeShellApplication {
@@ -39,6 +48,8 @@ in
           else "$(mktemp --directory)"
         }"
 
+        mkdir -p "$TYPST_WATCH_DIRECTORY"
+
         ${
           if timings
           then ''mkdir -p "$TYPST_WATCH_DIRECTORY/dev"''
@@ -50,8 +61,6 @@ in
           then ''trap 'rm -r "$TYPST_WATCH_DIRECTORY"' EXIT''
           else ""
         }
-
-        # TODO: timings $out/$${timings_name_timings}.json
 
         typst watch "${entrypoint}" \
         --jobs "${builtins.toString jobs}" \
@@ -82,6 +91,26 @@ in
         ${
           if timings
           then ''--timings "$TYPST_WATCH_DIRECTORY/dev/timings.json"''
+          else ""
+        } \
+        ${
+          if format == "html"
+          then "--features html"
+          else ""
+        } \
+        ${
+          if format == "html" && port != null
+          then "--port ${builtins.toString port}"
+          else ""
+        } \
+        ${
+          if format == "html" && noServe
+          then "--no-serve"
+          else ""
+        } \
+        ${
+          if format == "html" && noReload
+          then "--no-reload"
           else ""
         } \
         "$TYPST_WATCH_DIRECTORY/${name}${
