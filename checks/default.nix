@@ -1,8 +1,9 @@
 args: {
   autoDiscoverPackages = import ./autoDiscoverPackages args;
   mergeTypstPackages = import ./mergeTypstPackages args;
-  mkTypstDerevation = import ./mkTypstDerevation args;
-  mkTypstDerevationTypstPackages = import ./mkTypstDerevationTypstPackages args;
+  mkTypstDerivation = import ./mkTypstDerivation args;
+  mkTypstDerivationHTML = import ./mkTypstDerivationHTML args;
+  mkTypstDerivationTypstPackages = import ./mkTypstDerivationTypstPackages args;
   mkWatchTypstProject = import ./mkWatchTypstProject args;
   mkTypstPackage = import ./mkTypstPackage args;
   mkTypstPackageSet = import ./mkTypstPackageSet args;

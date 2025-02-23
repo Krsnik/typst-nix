@@ -3,7 +3,7 @@ args @ {
   typstPackages ? {},
 }: rec {
   # Expose library functions #
-  mkTypstDerevation = pkgs.callPackage ./mkTypstDerevation.nix {};
+  mkTypstDerivation = pkgs.callPackage ./mkTypstDerivation.nix {};
   mkTypstShell = pkgs.callPackage ./mkTypstShell.nix {};
   mkWatchTypstProject = pkgs.callPackage ./mkWatchTypstProject.nix {};
 
@@ -56,7 +56,7 @@ args @ {
           else []
         );
     in rec {
-      build = mkTypstDerevation {
+      build = mkTypstDerivation {
         inherit src name entrypoint fonts inputs format ppi typst numberFormat creationTimestamp pages jobs timings;
         packages = mappedPackages;
       };

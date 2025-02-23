@@ -17,6 +17,6 @@ A nix library to develop and build [Typst](https://typst.app/) projects.
 - mkTypstPackage
   - Allow for embedding fonts
   - Allow for linking embedding arbitrary data
-- mkTypstDerevation
+- mkTypstDerivation
   - Allow for html support. (With version check).
   - Make into an abstract method that the consumer can override parts of.

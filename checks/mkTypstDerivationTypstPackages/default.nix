@@ -1,15 +1,14 @@
 {
   self,
-  system,
   pkgs,
   lib,
   ...
 }:
-lib.mkTypstDerevation {
+lib.mkTypstDerivation {
   src = ./src;
-  name = "mkTypstDerevation";
+  name = "mkTypstDerivationAllTypstPackages";
   fonts = with pkgs; [roboto];
-  packages = [self.packages.${system}."preview/example:0.1.0"];
+  packages = ["${self.inputs.typstPackagesRepository}/packages"];
   pages = "2,3-";
   inputs = {
     lang = "de";
