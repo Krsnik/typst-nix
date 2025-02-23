@@ -66,6 +66,7 @@ in rec {
         patch = builtins.elemAt versionList 2;
       in
         attrsets.recursiveUpdate acc {
+          "${package.name}:${package.version}" = package;
           ${package.name} = {
             ${package.version} = package;
             ${major}.${minor}.${patch} = package;
@@ -73,15 +74,14 @@ in rec {
         })
       {} (getTypstPackagePathsFromList packageSrcs))
     srcs;
+
+    attrsets = pkgs.lib.attrsets;
+    isDerivation = x: x ? "type" && x.type == "derivation";
+    getDerivationPackages = attrsets.filterAttrs (name: value: isDerivation value);
+
+    absolutePaths = attrsets.concatMapAttrs (namespace: packages:
+      attrsets.concatMapAttrs (name: value: {"${namespace}/${name}" = value;}) (getDerivationPackages packages))
+    packageSetWithoutAbsolutePaths;
   in
-    packageSetWithoutAbsolutePaths
-    // (
-      builtins.foldl' (acc: packages: acc // packages) {} (builtins.attrValues (builtins.mapAttrs (
-          namespace: packages: let
-            packageDrvs = attrsets.collect (x: x ? "type" && x.type == "derivation") packages;
-          in
-            builtins.foldl' (acc: package: acc // {"${namespace}/${package.name}:${package.version}" = package;}) {} packageDrvs
-        )
-        packageSetWithoutAbsolutePaths))
-    );
+    packageSetWithoutAbsolutePaths // absolutePaths;
 }

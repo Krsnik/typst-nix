@@ -19,18 +19,20 @@
     forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
     pkgs = forAllSystems (system: nixpkgs.legacyPackages.${system});
   in rec {
-    previewPackages = forAllSystems (system:
+    typstPackages = forAllSystems (system:
       self.lib.${system}.mkTypstPackageSet {
         "preview" = ["${inputs.previewPackagesRepository}/packages/preview/"];
       });
 
-    packages = forAllSystems (
-      system: let
-        attrsets = pkgs.${system}.lib.attrsets;
-        isDerivation = x: x ? "type" && x.type == "derivation";
-      in
-        attrsets.filterAttrs (name: value: isDerivation value) self.previewPackages.${system}
-    );
+    previewPackages =
+      forAllSystems (system:
+        typstPackages.${system}.preview);
+
+    packages = forAllSystems (system: let
+      attrsets = pkgs.${system}.lib.attrsets;
+      isDerivation = x: x ? "type" && x.type == "derivation";
+    in
+      attrsets.filterAttrs (name: value: isDerivation value) self.typstPackages.${system});
 
     mkLib = args @ {
       pkgs,
