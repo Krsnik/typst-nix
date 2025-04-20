@@ -18,8 +18,8 @@ in
     open ? false,
     viewer ?
       if format == "html"
-      then "${pkgs.xdg-utils}/bin/xdg-open"
-      else "${pkgs.zathura}/bin/zathura",
+      then "${pkgs.xdg-utils}/bin/xdg-open" # Open in default browser.
+      else "${pkgs.zathura}/bin/zathura", # Open in a lightweight, automatically reloading PDF and image viewer.
     out ? null, # Which directory to save the temporary output. Default: Create a new temporary directory.
     keepOut ? false,
     timings ? false, # Produces performance timings of the compilation process (experimental).

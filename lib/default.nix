@@ -19,10 +19,10 @@ args @ {
     strings = pkgs.lib.strings;
     attrsets = pkgs.lib.attrsets;
   in
-    mkTypstProjectArgs @ {
+    {
       src,
-      name ? strings.removeSuffix ".typ" (builtins.baseNameOf entrypoint),
       entrypoint ? "main.typ",
+      name ? strings.removeSuffix ".typ" (builtins.baseNameOf entrypoint),
       fonts ? [],
       packages ? [],
       inputs ? {},

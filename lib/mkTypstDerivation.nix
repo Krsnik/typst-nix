@@ -67,11 +67,7 @@ in
           then "--timings $out/dev/timings.json"
           else ""
         } \
-        ${
-          if format == "html"
-          then "--features html"
-          else ""
-        } \
+        --features html \
         "$out/${name}${
           if builtins.elem checkedFormat ["png" "svg"]
           then numberFormat
