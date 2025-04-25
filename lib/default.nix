@@ -63,7 +63,10 @@ args @ {
 
       mkWatch = {
         open ? false,
-        viewer ? "${pkgs.zathura}/bin/zathura",
+        viewer ?
+          if format == "html"
+          then "${pkgs.xdg-utils}/bin/xdg-open"
+          else "${pkgs.zathura}/bin/zathura",
         out ? null,
         keepOut ? false,
       }:
@@ -74,7 +77,10 @@ args @ {
 
       watch = args @ {
         open ? false,
-        viewer ? "${pkgs.zathura}/bin/zathura",
+        viewer ?
+          if format == "html"
+          then "${pkgs.xdg-utils}/bin/xdg-open"
+          else "${pkgs.zathura}/bin/zathura",
         out ? null,
         keepOut ? false,
       }: {
