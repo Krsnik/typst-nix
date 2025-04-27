@@ -61,6 +61,8 @@ args @ {
         packages = mappedPackages;
       };
 
+      inherit (pkgs.callPackage ./utils.nix {}) stripStorePrefix;
+
       mkWatch = {
         open ? false,
         viewer ?
