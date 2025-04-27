@@ -69,9 +69,12 @@ args @ {
           else "${pkgs.zathura}/bin/zathura",
         out ? null,
         keepOut ? false,
-      }:
+      }: let
+        inherit (pkgs.callPackage ./utils.nix {}) stripStorePrefix;
+      in
         mkWatchTypstProject {
-          inherit name entrypoint fonts inputs format ppi typst numberFormat creationTimestamp pages jobs timings open viewer out keepOut;
+          inherit name fonts inputs format ppi typst numberFormat creationTimestamp pages jobs timings open viewer out keepOut;
+          entrypoint = ".${stripStorePrefix src}/${entrypoint}";
           packages = mappedPackages;
         };
 
