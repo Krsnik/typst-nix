@@ -5,7 +5,7 @@
     inherit (lib.strings) removePrefix;
 
     # Get the '/nix/store' part
-    storePrefix = builtins.toString (builtins.dirOf ./.);
+    storePrefix = builtins.toString (builtins.dirOf (builtins.dirOf ./.));
 
     # Remove the '/nix/store' part, which leaves '/<hash>-<name>/contents/of/project'.
     storePathWithPrefixRemoved = removePrefix storePrefix (builtins.toString storePath);
