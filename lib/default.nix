@@ -71,11 +71,10 @@ args @ {
         keepOut ? false,
       }: let
         inherit (pkgs.callPackage ./utils.nix {}) stripStorePrefix;
-        newEntryPoint = ".${stripStorePrefix src}/${entrypoint}";
       in
         mkWatchTypstProject {
           inherit name fonts inputs format ppi typst numberFormat creationTimestamp pages jobs timings open viewer out keepOut;
-          entrypoint = newEntryPoint;
+          entrypoint = ".${stripStorePrefix src}/${entrypoint}";
           packages = mappedPackages;
         };
 
