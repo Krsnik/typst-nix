@@ -56,7 +56,8 @@
         ./. + "${removePrefix rootPathString storePathString}";
     in {
       path = stripStorePrefix src;
-      inherit entrypoint;
+      inherit entrypoint src;
+      rootPath = ./.;
     };
 
     mkLib = args @ {
