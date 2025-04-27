@@ -7,8 +7,6 @@ args @ {
   mkTypstShell = pkgs.callPackage ./mkTypstShell.nix {};
   mkWatchTypstProject = pkgs.callPackage ./mkWatchTypstProject.nix {};
 
-  inherit (pkgs.callPackage ./utils.nix {}) stripStorePrefix;
-
   # Functions pertaining to packages
   typstPackages = pkgs.callPackage ./typstPackage.nix {};
   inherit (typstPackages) mkTypstPackage mkTypstPackageSet mergeTypstPackages getPackageImports;
@@ -73,10 +71,11 @@ args @ {
         keepOut ? false,
       }: let
         inherit (pkgs.callPackage ./utils.nix {}) stripStorePrefix;
+        newEntryPoint = ".${stripStorePrefix src}/${entrypoint}";
       in
         mkWatchTypstProject {
           inherit name fonts inputs format ppi typst numberFormat creationTimestamp pages jobs timings open viewer out keepOut;
-          entrypoint = ".${stripStorePrefix src}/${entrypoint}";
+          entrypoint = newEntryPoint;
           packages = mappedPackages;
         };
 
