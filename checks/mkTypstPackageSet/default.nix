@@ -2,7 +2,8 @@
   pkgs,
   lib,
   ...
-}: let
+}:
+let
   packagePreview = lib.mkTypstPackage {
     src = ./src;
     namespace = "preview";
@@ -12,12 +13,12 @@
     namespace = "otherNamespace";
   };
   packages = lib.mkTypstPackageSet {
-    preview = [./src];
-    otherNamespace = [./src];
+    preview = [ ./src ];
+    otherNamespace = [ ./src ];
   };
 in
-  assert packages
-  == {
+assert
+  packages == {
     "preview/example:0.1.0" = packagePreview;
     preview."example:0.1.0" = packagePreview;
     preview.example."0.1.0" = packagePreview;
@@ -27,4 +28,4 @@ in
     otherNamespace.example."0.1.0" = packageOtherNamespace;
     otherNamespace.example."0"."1"."0" = packageOtherNamespace;
   };
-    pkgs.runCommandLocal "mkTypstPackageSet" {} "mkdir $out"
+pkgs.runCommandLocal "mkTypstPackageSet" { } "mkdir $out"

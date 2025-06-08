@@ -7,8 +7,8 @@
 lib.mkTypstDerivation {
   src = ./src;
   name = "mkTypstDerivationAllTypstPackages";
-  fonts = with pkgs; [roboto];
-  packages = ["${self.inputs.typstPackagesRepository}/packages"];
+  fonts = with pkgs; [ roboto ];
+  packages = [ "${self.inputs.typstPackagesRepository}/packages" ];
   pages = "2,3-";
   inputs = {
     lang = "de";
