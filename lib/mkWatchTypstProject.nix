@@ -1,7 +1,10 @@
-{ pkgs }:
+{
+  pkgs,
+  lib,
+  mergeTypstPackages,
+}:
 let
-  strings = pkgs.lib.strings;
-  typstPackage = pkgs.callPackage ./typstPackage.nix { };
+  inherit (lib) strings;
 in
 {
   name ? strings.removeSuffix ".typ" (builtins.baseNameOf entrypoint),
@@ -62,14 +65,12 @@ pkgs.writeShellApplication {
     typst watch "${entrypoint}" \
     --jobs "${builtins.toString jobs}" \
     --creation-timestamp "${builtins.toString creationTimestamp}" \
-    ${
-      if packages != [ ] then ''--package-path "${typstPackage.mergeTypstPackages packages}"'' else ""
-    } \
+    ${if packages != [ ] then ''--package-path "${mergeTypstPackages packages}"'' else ""} \
     --ignore-system-fonts \
-    ${if fonts != [ ] then ''--font-path "${strings.concatStringsSep ":" fonts}"'' else ""} \
+    ${if fonts != [ ] then ''--font-path "${builtins.concatStringsSep ":" fonts}"'' else ""} \
     ${
       if inputs != { } then
-        strings.concatStringsSep " " (
+        builtins.concatStringsSep " " (
           builtins.map (attr: "--input '${attr}=${builtins.toString inputs.${attr}}'") (
             builtins.attrNames inputs
           )

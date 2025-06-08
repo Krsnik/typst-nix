@@ -1,8 +1,7 @@
-{ pkgs }:
-let
-  strings = pkgs.lib.strings;
-  typstPackages = pkgs.callPackage ./typstPackage.nix { };
-in
+{
+  pkgs,
+  mergeTypstPackages,
+}:
 {
   typst ? pkgs.typst,
   fonts ? [ ],
@@ -12,9 +11,9 @@ in
 pkgs.mkShellNoCC {
   "SOURCE_DATE_EPOCH" = builtins.toString creationTimestamp;
 
-  "TYPST_FONT_PATHS" = if fonts != [ ] then strings.concatStringsSep ":" fonts else null;
+  "TYPST_FONT_PATHS" = if fonts != [ ] then builtins.concatStringsSep ":" fonts else null;
 
-  "TYPST_PACKAGE_PATH" = if packages != [ ] then typstPackages.mergeTypstPackages packages else null;
+  "TYPST_PACKAGE_PATH" = if packages != [ ] then mergeTypstPackages packages else null;
 
   packages = [
     typst
