@@ -1,14 +1,25 @@
-{ pkgs }:
+{
+  pkgs,
+  typstPackages,
+}:
+let
+  inherit (pkgs) callPackage;
+in
 rec {
-  getPackageImports = pkgs.callPackage ./getPackageImports.nix { };
-  autoDiscoverPackages = pkgs.callPackage ./autoDiscoverPackages { inherit getPackageImports; };
-  getTypstPackagePaths = pkgs.callPackage ./getTypstPackagePaths.nix { };
-  getTypstPackagePathsFromList = pkgs.callPackage ./getTypstPackagePathsFromList.nix {
+  getPackageImports = callPackage ./getPackageImports.nix { };
+  autoDiscoverPackages = callPackage ./autoDiscoverPackages.nix {
+    inherit getPackageImports typstPackages;
+  };
+  getTypstPackagePaths = callPackage ./getTypstPackagePaths.nix { };
+  getTypstPackagePathsFromList = callPackage ./getTypstPackagePathsFromList.nix {
     inherit getTypstPackagePaths;
   };
-  mkTypstPackage = pkgs.callPackage ./mkTypstPackage.nix { };
-  mergeTypstPackages = pkgs.callPackage ./mergeTypstPackages.nix { };
-  mkTypstPackageSet = pkgs.callPackage ./mkTypstPackageSet.nix {
+  mkTypstPackage = callPackage ./mkTypstPackage.nix { inherit autoDiscoverPackages; };
+  mergeTypstPackages = callPackage ./mergeTypstPackages.nix { };
+  mkTypstPackageSet = callPackage ./mkTypstPackageSet.nix {
     inherit mkTypstPackage getTypstPackagePathsFromList;
+  };
+  mkTypstPackagesRepository = callPackage ./mkTypstPackagesRepository.nix {
+    inherit mkTypstPackageSet;
   };
 }

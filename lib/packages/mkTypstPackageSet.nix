@@ -11,7 +11,10 @@ let
       (
         acc: src:
         let
-          package = mkTypstPackage { inherit src namespace; };
+          package = mkTypstPackage {
+            inherit src namespace;
+            autoDiscoverPackages = false;
+          };
           versionList = builtins.match "([0-9]+)\.([0-9]+)\.([0-9]+)" package.version;
           major = builtins.elemAt versionList 0;
           minor = builtins.elemAt versionList 1;

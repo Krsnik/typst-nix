@@ -1,5 +1,7 @@
+#import"@preview/example:0.1.0"
 #import "@preview/example:0.1.0"
-// // match all of these
+\// #import "@preview/example:0.1.0"
+// match all of these
 // #import"@preview/example:1.1.1" // no whitespace
 // #import "@preview/example:1.1.2" // single space
 // #import    "@preview/example:1.1.3" // multiple spaces

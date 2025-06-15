@@ -29,18 +29,7 @@
     in
     rec {
       typstPackages = forAllSystems (
-        system:
-        let
-          attrsets = pkgs.${system}.lib.attrsets;
-          packagesDir = "${inputs.typstPackagesRepository}/packages";
-          namespaces = attrsets.filterAttrs (filename: filetype: filetype == "directory") (
-            builtins.readDir packagesDir
-          );
-          namespacesWithSrcs = attrsets.concatMapAttrs (namespace: value: {
-            ${namespace} = [ "${packagesDir}/${namespace}" ];
-          }) namespaces;
-        in
-        self.lib.${system}.mkTypstPackageSet namespacesWithSrcs
+        system: self.lib.${system}.mkTypstPackagesRepository "${inputs.typstPackagesRepository}/packages"
       );
 
       previewPackages = forAllSystems (system: typstPackages.${system}.preview);

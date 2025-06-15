@@ -1,28 +1,33 @@
 args@{
   pkgs,
-  typstPackages ? { },
+  typstPackages,
 }:
+let
+  inherit (pkgs) callPackage;
+in
 rec {
-  mkTypstDerivation = pkgs.callPackage ./mkTypstDerivation.nix { inherit mergeTypstPackages; };
-  mkTypstShell = pkgs.callPackage ./mkTypstShell.nix { inherit mergeTypstPackages; };
-  mkWatchTypstProject = pkgs.callPackage ./mkWatchTypstProject.nix { inherit mergeTypstPackages; };
+  mkTypstDerivation = callPackage ./mkTypstDerivation.nix { inherit mergeTypstPackages; };
+  mkTypstShell = callPackage ./mkTypstShell.nix { inherit mergeTypstPackages; };
+  mkWatchTypstProject = callPackage ./mkWatchTypstProject.nix { inherit mergeTypstPackages; };
 
   # Functions pertaining to packages
-  inherit (pkgs.callPackage ./packages { })
+  inherit (callPackage ./packages { inherit typstPackages; })
     mkTypstPackage
     mkTypstPackageSet
     mergeTypstPackages
     getPackageImports
+    autoDiscoverPackages
+    mkTypstPackagesRepository
     ;
 
-  mkTypstProject = pkgs.callPackage ./mkTypstProject.nix {
+  mkTypstProject = callPackage ./mkTypstProject.nix {
     inherit
       getPackageImports
       mkTypstDerivation
       mkWatchTypstProject
       mkTypstShell
       ;
-    inherit (pkgs.callPackage ./utils.nix { }) stripStorePrefix;
+    inherit (callPackage ./utils.nix { }) stripStorePrefix;
     typstPackages = args.typstPackages;
   };
 

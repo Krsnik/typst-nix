@@ -5,11 +5,16 @@ let
   packageName = namespace;
   version = "[0-9]+\\.[0-9]+\\.[0-9]+";
 
+  hasComment = line: (builtins.match ".*(//).*" line) == null;
+
+  matchImport =
+    x: builtins.match ".*import[[:blank:]]*\"@(${namespace}/${packageName}:${version})\".*" x;
+
   getImportsFromFile =
     typstFile:
     builtins.filter (x: !(x == null)) (
-      builtins.map (builtins.match "[[:blank:]]*\"@(${namespace}/${packageName}:${version})\".*") (
-        strings.splitString "import" (builtins.readFile typstFile)
+      builtins.map matchImport (
+        builtins.filter hasComment (strings.splitString "\n" (builtins.readFile typstFile))
       )
     );
 
