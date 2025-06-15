@@ -2,7 +2,7 @@
 {
   src, # Path to a typst package. Expects 'typst.toml' at the top level.
   namespace ? "preview", # Name of the namespace the package should appear under.
-  packages ? [ ], # Will include (symlinkJoin) into the same derevation.
+  packages ? [ ], # Will include (symlinkJoin) into the same derivation.
 # fonts ? [], # TODO/figure out (with builtInputs or an extra attribute perhaps?)
 }:
 let
