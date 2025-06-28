@@ -10,6 +10,8 @@ let
   package = pkgs.stdenvNoCC.mkDerivation rec {
     inherit ((builtins.fromTOML (builtins.readFile "${src}/typst.toml")).package) name version;
 
+    allowSubstitutes = false;
+
     dontUnpack = true;
 
     installPhase = ''
